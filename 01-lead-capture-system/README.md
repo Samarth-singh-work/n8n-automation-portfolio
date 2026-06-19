@@ -1,4 +1,4 @@
-# Lead Capture System
+# Lead Capture and Notification System
 
 ## Overview
 
