@@ -78,7 +78,7 @@ Currently building advanced AI automation systems and workflow solutions for bus
 
 ## Connect With Me
 
-LinkedIn: (Add your LinkedIn profile)
+LinkedIn: https://www.linkedin.com/in/samarth-singh-work/
 
 GitHub: https://github.com/Samarth-singh-work
 
