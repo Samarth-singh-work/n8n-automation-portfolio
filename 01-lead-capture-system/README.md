@@ -26,6 +26,10 @@ Form Trigger → Google Sheets → Email Notification
 
 Businesses can automatically capture and manage leads without manually updating spreadsheets or checking forms.
 
+## Workflow Screenshot
+
+![Lead Capture Workflow](workflow-screenshot.png)
+
 ## Author
 
 Samarth Singh
