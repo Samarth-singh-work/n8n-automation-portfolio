@@ -1,0 +1,267 @@
+{
+  "name": "LinkedIn Content Automation System",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "LinkedIn Content Automation System",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Topic"
+            },
+            {
+              "fieldLabel": "Tone",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Professional"
+                  },
+                  {
+                    "option": "Educational"
+                  },
+                  {
+                    "option": "Storytelling"
+                  },
+                  {
+                    "option": "Motivational"
+                  },
+                  {
+                    "option": "Thought Leadership"
+                  },
+                  {
+                    "option": "Conversational"
+                  },
+                  {
+                    "option": "Data-Driven"
+                  },
+                  {
+                    "option": "Humorous"
+                  },
+                  {
+                    "option": "Bold & Contrarian"
+                  },
+                  {
+                    "option": "Case Study"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "",
+      "name": "On form submission",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a LinkedIn post.\n\nTopic: {{$json.Topic}}\n\nTone: {{$json.Tone}}\n\nRequirements:\n- Strong hook\n- 150-250 words\n- Short paragraphs\n- Use relevant emojis\n- Include actionable insights\n- End with a question\n- Format for LinkedIn readability",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "google/gemma-4-31b-it:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        304,
+        224
+      ],
+      "id": "",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Content Automation System",
+          "cachedResultUrl": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "YOUR_SHEET_NAME",
+          "cachedResultUrl": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{ $('On form submission').item.json.Topic }}",
+            "Tone": "={{ $('On form submission').item.json.Tone }}",
+            "Generated Post": "={{ $json.text }}",
+            "Date": "={{$now}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tone",
+              "displayName": "Tone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Generated Post",
+              "displayName": "Generated Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        0
+      ],
+      "id": "",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aabbccdd",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "your-email@example.com",
+        "subject": "🚀 AI LinkedIn Post Generated",
+        "emailFormat": "text",
+        "text": "=🚀 New LinkedIn Post Generated\n\nTopic: {{ $('On form submission').item.json.Topic }}\n\nTone: {{ $('On form submission').item.json.Tone }}\n\nGenerated Post:\n\n{{ $('Basic LLM Chain').item.json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "",
+      "name": "Send email",
+      "webhookId": "",
+      "credentials": {
+        "smtp": {
+          "id": "",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "id": "",
+  "tags": []
+}
